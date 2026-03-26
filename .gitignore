@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+.env
+page_dump.html
+debug_form.py
+debug_grades.py
+ai_summary.py

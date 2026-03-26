@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>My Grades — PS Grade Tracker</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+
+    <div class="header-row">
+      <h1>Hi, {{ student_name }}</h1>
+      <a href="/" class="btn-secondary">Sign Out</a>
+    </div>
+
+    <!-- Grades Table -->
+    <div class="card">
+      <h2>Your Grades</h2>
+      {% if grades %}
+        <table class="grades-table">
+          <thead>
+            <tr>
+              {% for key in grades[0].keys() %}
+                <th>{{ key | title }}</th>
+              {% endfor %}
+            </tr>
+          </thead>
+          <tbody>
+            {% for course in grades %}
+              <tr>
+                {% for val in course.values() %}
+                  <td>{{ val }}</td>
+                {% endfor %}
+              </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      {% else %}
+        <p class="no-data">No grade data found. Your school may display grades differently — this will be fixed in a future update.</p>
+      {% endif %}
+    </div>
+
+  </div>
+</body>
+</html>

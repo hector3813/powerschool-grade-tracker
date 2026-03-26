@@ -12,7 +12,10 @@ class PowerSchoolClient:
 
     async def start(self):
         self._playwright = await async_playwright().start()
-        self._browser = await self._playwright.chromium.launch(headless=True)
+        self._browser = await self._playwright.chromium.launch(
+            headless=True,
+            args=["--no-sandbox", "--disable-setuid-sandbox", "--disable-dev-shm-usage"]
+        )
         self._page = await self._browser.new_page()
 
     async def login(self, username: str, password: str):

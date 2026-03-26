@@ -16,7 +16,7 @@ templates = Jinja2Templates(directory="templates")
 
 @app.get("/", response_class=HTMLResponse)
 async def login_page(request: Request):
-    return templates.TemplateResponse("index.html", {"request": request})
+    return templates.TemplateResponse(request=request, name="index.html")
 
 
 @app.post("/dashboard", response_class=HTMLResponse)
@@ -32,15 +32,13 @@ async def dashboard(
         grades = await client.get_grades()
         student_name = await client.get_student_name()
     except Exception as e:
-        return templates.TemplateResponse("index.html", {
-            "request": request,
+        return templates.TemplateResponse(request=request, name="index.html", context={
             "error": str(e)
         })
     finally:
         await client.close()
 
-    return templates.TemplateResponse("dashboard.html", {
-        "request": request,
+    return templates.TemplateResponse(request=request, name="dashboard.html", context={
         "student_name": student_name,
         "grades": grades,
     })

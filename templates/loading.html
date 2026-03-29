@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Loading your grades…</title>
+  <link rel="stylesheet" href="/static/style.css" />
+</head>
+<body>
+  <div class="container">
+    <div class="card login-card loading-card">
+      <div class="loading-spinner"></div>
+      <h2>Fetching your grades…</h2>
+      <p class="loading-status" id="status-text">Logging in to PowerSchool</p>
+      <p class="note">This takes about 30–60 seconds while we pull your standards from each course.</p>
+    </div>
+  </div>
+
+  <script>
+    const taskId = "{{ task_id }}";
+    const steps = [
+      "Logging in to PowerSchool",
+      "Fetching course list",
+      "Loading standards for each course",
+      "Calculating weighted averages",
+      "Almost done…",
+    ];
+    let step = 0;
+    const statusEl = document.getElementById("status-text");
+
+    // Cycle through friendly status messages
+    const msgInterval = setInterval(() => {
+      step = Math.min(step + 1, steps.length - 1);
+      statusEl.textContent = steps[step];
+    }, 8000);
+
+    // Poll for completion
+    const poll = setInterval(async () => {
+      try {
+        const res = await fetch(`/status/${taskId}`);
+        const data = await res.json();
+        if (data.status === "done") {
+          clearInterval(poll);
+          clearInterval(msgInterval);
+          statusEl.textContent = "Done! Loading your dashboard…";
+          window.location.href = `/result/${taskId}`;
+        } else if (data.status === "error") {
+          clearInterval(poll);
+          clearInterval(msgInterval);
+          statusEl.textContent = "Error: " + (data.error || "Something went wrong.");
+          statusEl.style.color = "#e63946";
+        }
+      } catch (e) {}
+    }, 1500);
+  </script>
+</body>
+</html>

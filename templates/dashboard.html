@@ -14,6 +14,15 @@
       <a href="/" class="btn-secondary">Sign Out</a>
     </div>
 
+    <!-- GPA Summary Card -->
+    {% if gpa is not none %}
+    <div class="gpa-card">
+      <div class="gpa-label">Calculated GPA</div>
+      <div class="gpa-value">{{ gpa }}</div>
+      <div class="gpa-note">Based on SBG weighted averages · 0.5 credits per course</div>
+    </div>
+    {% endif %}
+
     <!-- Grades Table -->
     <div class="card">
       <h2>Your Grades</h2>
@@ -21,26 +30,220 @@
         <table class="grades-table">
           <thead>
             <tr>
-              {% for key in grades[0].keys() %}
-                <th>{{ key | title }}</th>
-              {% endfor %}
+              <th>Period</th>
+              <th>Course</th>
+              <th>PS Grade</th>
+              <th>Calculated Avg</th>
+              <th>Calc Letter</th>
+              <th>GPA Pts</th>
+              <th>Absences</th>
+              <th>Tardies</th>
             </tr>
           </thead>
           <tbody>
-            {% for course in grades %}
+            {% for c in grades %}
               <tr>
-                {% for val in course.values() %}
-                  <td>{{ val }}</td>
-                {% endfor %}
+                <td>{{ c.period }}</td>
+                <td>{{ c.course }}</td>
+                <td><span class="grade-badge">{{ c.ps_grade }}</span></td>
+                <td>
+                  {% if c.avg is not none %}
+                    <strong>{{ c.avg }}</strong><span class="out-of">/9</span>
+                  {% else %}
+                    <span class="no-score">—</span>
+                  {% endif %}
+                </td>
+                <td>
+                  {% if c.letter %}
+                    <span class="grade-badge {% if c.letter.startswith('A') %}grade-a{% elif c.letter.startswith('B') %}grade-b{% elif c.letter.startswith('C') %}grade-c{% else %}grade-d{% endif %}">{{ c.letter }}</span>
+                  {% else %}
+                    <span class="no-score">—</span>
+                  {% endif %}
+                </td>
+                <td>{{ c.gpa if c.gpa is not none else "—" }}</td>
+                <td>{{ c.absences }}</td>
+                <td>{{ c.tardies }}</td>
               </tr>
             {% endfor %}
           </tbody>
         </table>
       {% else %}
-        <p class="no-data">No grade data found. Your school may display grades differently — this will be fixed in a future update.</p>
+        <p class="no-data">No grade data found.</p>
       {% endif %}
     </div>
 
+    <!-- What If Calculator -->
+    <div class="card" id="whatif-card">
+      <h2>What If Calculator</h2>
+      <p class="whatif-desc">See what score you need on an upcoming test to hit your target grade.</p>
+
+      <div class="whatif-inputs">
+        <div class="whatif-field">
+          <label for="wi-course">Course</label>
+          <select id="wi-course">
+            {% for c in grades %}
+              {% if c.avg is not none %}
+                <option value="{{ loop.index0 }}">{{ c.course }}</option>
+              {% endif %}
+            {% endfor %}
+          </select>
+        </div>
+        <div class="whatif-field">
+          <label for="wi-standards">Number of standards on test</label>
+          <input type="number" id="wi-standards" min="1" max="20" value="1" />
+        </div>
+        <div class="whatif-field">
+          <label for="wi-weight">Weight per standard (asterisks)</label>
+          <select id="wi-weight">
+            <option value="1">* (1)</option>
+            <option value="2">** (2)</option>
+            <option value="3">*** (3)</option>
+          </select>
+        </div>
+        <div class="whatif-field">
+          <label for="wi-score">Score you expect to get (0–9)</label>
+          <input type="number" id="wi-score" min="0" max="9" step="0.5" value="7" />
+        </div>
+      </div>
+
+      <div id="whatif-results" class="whatif-results"></div>
+    </div>
+
+    <!-- Standards Breakdown per Course -->
+    {% for c in grades %}
+      {% if c.standards %}
+      <div class="card">
+        <h2>{{ c.course }} — Standards Breakdown</h2>
+        <table class="grades-table">
+          <thead>
+            <tr>
+              <th>Standard</th>
+              <th>Weight</th>
+              <th>Score</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for s in c.standards %}
+            <tr>
+              <td>{{ s.name }}</td>
+              <td>{{ s.weight | int }}</td>
+              <td><strong>{{ s.score | int }}</strong><span class="out-of">/9</span></td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+        <div class="course-avg">
+          Weighted Average: <strong>{{ c.avg }}/9</strong> → {{ c.letter }}
+        </div>
+      </div>
+      {% endif %}
+    {% endfor %}
+
   </div>
+
+  <script>
+    const GRADES = [
+      { letter: "A+", min: 8.50, gpa: 4.0 },
+      { letter: "A",  min: 7.56, gpa: 4.0 },
+      { letter: "A-", min: 7.00, gpa: 3.7 },
+      { letter: "B+", min: 6.44, gpa: 3.3 },
+      { letter: "B",  min: 5.89, gpa: 3.0 },
+      { letter: "B-", min: 5.33, gpa: 2.7 },
+      { letter: "C+", min: 4.78, gpa: 2.3 },
+      { letter: "C",  min: 4.22, gpa: 2.0 },
+      { letter: "C-", min: 3.67, gpa: 1.7 },
+      { letter: "D+", min: 3.11, gpa: 1.3 },
+      { letter: "D",  min: 2.56, gpa: 1.0 },
+      { letter: "D-", min: 2.00, gpa: 0.7 },
+      { letter: "F",  min: 0.00, gpa: 0.0 },
+    ];
+
+    const COURSES = [
+      {% for c in grades %}{% if c.avg is not none %}
+      {
+        name: {{ c.course | tojson }},
+        totalWeightedSum: {{ c.total_weighted_sum }},
+        totalWeight: {{ c.total_weight }},
+        currentAvg: {{ c.avg }},
+      },
+      {% endif %}{% endfor %}
+    ];
+
+    function letterFor(avg) {
+      for (const g of GRADES) if (avg >= g.min) return g.letter;
+      return "F";
+    }
+
+    function calcNeeded(course, N, W, target) {
+      // new_avg = (totalWeightedSum + N*score*W) / (totalWeight + N*W) >= target
+      // => score >= (target * (totalWeight + N*W) - totalWeightedSum) / (N * W)
+      return (target * (course.totalWeight + N * W) - course.totalWeightedSum) / (N * W);
+    }
+
+    function update() {
+      const idx    = parseInt(document.getElementById("wi-course").value);
+      const N      = parseInt(document.getElementById("wi-standards").value) || 1;
+      const W      = parseInt(document.getElementById("wi-weight").value);
+      const score  = parseFloat(document.getElementById("wi-score").value);
+      const course = COURSES[idx];
+      if (!course || isNaN(score)) return;
+
+      const clampedScore = Math.max(0, Math.min(9, score));
+      const newWeightedSum = course.totalWeightedSum + N * clampedScore * W;
+      const newTotalWeight = course.totalWeight + N * W;
+      const newAvg = newWeightedSum / newTotalWeight;
+      const newLetter = letterFor(newAvg);
+      const currentLetter = letterFor(course.currentAvg);
+
+      const diff = newAvg - course.currentAvg;
+      const diffStr = (diff >= 0 ? "+" : "") + diff.toFixed(2);
+      const diffClass = diff > 0 ? "wi-up" : diff < 0 ? "wi-down" : "wi-same";
+
+      // What score needed for each grade boundary
+      const neededRows = GRADES.slice(0, 9).map(g => {
+        const needed = calcNeeded(course, N, W, g.min);
+        const possible = needed <= 9;
+        const already = needed <= course.currentAvg;
+        return { letter: g.letter, needed, possible, already };
+      });
+
+      const html = `
+        <div class="wi-projection">
+          <div class="wi-proj-block">
+            <div class="wi-proj-label">Current Grade</div>
+            <div class="wi-proj-value">${course.currentAvg}/9</div>
+            <div class="wi-proj-letter ${currentLetter.startsWith('A') ? 'grade-a' : currentLetter.startsWith('B') ? 'grade-b' : 'grade-c'}">${currentLetter}</div>
+          </div>
+          <div class="wi-arrow">→</div>
+          <div class="wi-proj-block">
+            <div class="wi-proj-label">After Test (${N} std × wt ${W}, score ${clampedScore})</div>
+            <div class="wi-proj-value">${newAvg.toFixed(2)}/9 <span class="${diffClass}">(${diffStr})</span></div>
+            <div class="wi-proj-letter ${newLetter.startsWith('A') ? 'grade-a' : newLetter.startsWith('B') ? 'grade-b' : 'grade-c'}">${newLetter}</div>
+          </div>
+        </div>
+        <details class="wi-details">
+          <summary>What score do I need for each grade?</summary>
+          <table class="grades-table whatif-table" style="margin-top:0.8rem">
+            <thead><tr><th>Target</th><th>Score Needed on This Test</th><th></th></tr></thead>
+            <tbody>
+              ${neededRows.map(r => `
+                <tr class="${r.already ? 'wi-already' : r.possible ? '' : 'wi-impossible'}">
+                  <td><strong>${r.letter}</strong></td>
+                  <td>${r.already ? 'Already there!' : r.possible ? r.needed.toFixed(2) + ' / 9' : 'Not possible this test'}</td>
+                  <td>${r.already ? '✅' : r.possible ? (r.needed <= 6 ? '🟢' : r.needed <= 8 ? '🟡' : '🔴') : '—'}</td>
+                </tr>`).join('')}
+            </tbody>
+          </table>
+        </details>`;
+
+      document.getElementById("whatif-results").innerHTML = html;
+    }
+
+    document.getElementById("wi-course")?.addEventListener("change", update);
+    document.getElementById("wi-standards")?.addEventListener("input", update);
+    document.getElementById("wi-weight")?.addEventListener("change", update);
+    document.getElementById("wi-score")?.addEventListener("input", update);
+    update();
+  </script>
 </body>
 </html>

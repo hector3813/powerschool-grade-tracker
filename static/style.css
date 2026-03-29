@@ -206,3 +206,225 @@ body {
   color: #888;
   font-size: 0.95rem;
 }
+
+/* GPA summary card */
+.gpa-card {
+  background: linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 1.8rem 2rem;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+  text-align: center;
+}
+
+.gpa-label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  opacity: 0.8;
+  margin-bottom: 0.4rem;
+}
+
+.gpa-value {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1;
+  margin-bottom: 0.4rem;
+}
+
+.gpa-note {
+  font-size: 0.8rem;
+  opacity: 0.7;
+}
+
+/* Grade badges */
+.grade-badge {
+  display: inline-block;
+  padding: 0.2rem 0.55rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  background: #f0f0f8;
+  color: #333;
+}
+
+.grade-a { background: #dcfce7; color: #166534; }
+.grade-b { background: #dbeafe; color: #1e40af; }
+.grade-c { background: #fef9c3; color: #854d0e; }
+.grade-d { background: #fee2e2; color: #991b1b; }
+
+.out-of {
+  color: #aaa;
+  font-size: 0.8rem;
+  margin-left: 1px;
+}
+
+.no-score {
+  color: #ccc;
+}
+
+/* Course average footer */
+.course-avg {
+  margin-top: 1rem;
+  padding-top: 0.8rem;
+  border-top: 1px solid #f0f0f0;
+  font-size: 0.9rem;
+  color: #555;
+  text-align: right;
+}
+
+/* What If Calculator */
+.whatif-desc {
+  color: #666;
+  font-size: 0.9rem;
+  margin-bottom: 1.2rem;
+}
+
+.whatif-inputs {
+  display: flex;
+  gap: 1.2rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+}
+
+.whatif-field {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  flex: 1;
+  min-width: 160px;
+}
+
+.whatif-field label {
+  font-size: 0.78rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+}
+
+.whatif-field select,
+.whatif-field input {
+  padding: 0.55rem 0.75rem;
+  border: 1.5px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  background: #fafafa;
+  color: #1a1a2e;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.whatif-field select:focus,
+.whatif-field input:focus {
+  border-color: #5b5bd6;
+}
+
+.whatif-current {
+  font-size: 0.9rem;
+  color: #555;
+  margin-bottom: 1rem;
+  padding: 0.7rem 1rem;
+  background: #f7f7ff;
+  border-radius: 8px;
+}
+
+.whatif-table { margin-top: 0; }
+
+tr.wi-already td { color: #2a9d5c; }
+tr.wi-impossible td { color: #bbb; }
+
+/* What If - Projection display */
+.wi-projection {
+  display: flex;
+  align-items: center;
+  gap: 1.5rem;
+  background: #f7f7ff;
+  border-radius: 12px;
+  padding: 1.2rem 1.5rem;
+  margin-bottom: 1.2rem;
+  flex-wrap: wrap;
+}
+
+.wi-proj-block {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+}
+
+.wi-proj-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: #888;
+  font-weight: 600;
+}
+
+.wi-proj-value {
+  font-size: 1.4rem;
+  font-weight: 700;
+  color: #1a1a2e;
+}
+
+.wi-proj-letter {
+  display: inline-block;
+  padding: 0.2rem 0.7rem;
+  border-radius: 6px;
+  font-weight: 700;
+  font-size: 1rem;
+  background: #eee;
+  width: fit-content;
+}
+
+.wi-arrow {
+  font-size: 1.8rem;
+  color: #5b5bd6;
+  font-weight: 300;
+}
+
+.wi-up   { color: #2a9d5c; font-size: 0.85rem; }
+.wi-down { color: #e63946; font-size: 0.85rem; }
+.wi-same { color: #888;    font-size: 0.85rem; }
+
+.wi-details {
+  margin-top: 0.5rem;
+}
+
+.wi-details summary {
+  cursor: pointer;
+  font-size: 0.88rem;
+  color: #5b5bd6;
+  font-weight: 600;
+  padding: 0.3rem 0;
+  user-select: none;
+}
+
+/* Loading page */
+.loading-card {
+  text-align: center;
+  padding: 3rem 2rem;
+}
+
+.loading-spinner {
+  width: 52px;
+  height: 52px;
+  border: 4px solid #e0e0f0;
+  border-top-color: #5b5bd6;
+  border-radius: 50%;
+  animation: spin 0.9s linear infinite;
+  margin: 0 auto 1.5rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-status {
+  color: #5b5bd6;
+  font-weight: 600;
+  margin: 0.5rem 0 1rem;
+  min-height: 1.4em;
+  transition: opacity 0.3s;
+}
